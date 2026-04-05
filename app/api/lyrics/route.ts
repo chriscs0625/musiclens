@@ -5,45 +5,6 @@ import { searchTrack, getTrackLyrics, getTrackLyricsTranslation } from '@/lib/mu
 import { searchSong, extractMetadata } from '@/lib/genius'
 import type { LyricsResponse, SearchInput } from '@/types/lyrics'
 
-// Simple rate limiting: store IP -> request count
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
-const RATE_LIMIT_WINDOW_MS = 60 * 1000 // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 20
-
-/**
- * Check rate limit for an IP address
- */
-function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
-  const now = Date.now()
-  const record = rateLimitMap.get(ip)
-
-  if (!record || now > record.resetTime) {
-    // Reset window
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS })
-    return { allowed: true }
-  }
-
-  record.count++
-
-  if (record.count > RATE_LIMIT_MAX_REQUESTS) {
-    const retryAfter = Math.ceil((record.resetTime - now) / 1000)
-    return { allowed: false, retryAfter }
-  }
-
-  return { allowed: true }
-}
-
-/**
- * Get client IP from request
- */
-function getClientIp(request: NextRequest): string {
-  return (
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-    request.headers.get('x-real-ip') ||
-    '127.0.0.1'
-  )
-}
-
 export async function POST(request: NextRequest): Promise<NextResponse<LyricsResponse>> {
   try {
     // Check if API keys are configured
@@ -61,25 +22,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<LyricsRes
           error: 'API keys not configured. Please set MUSIXMATCH_API_KEY and GENIUS_ACCESS_TOKEN environment variables.',
         },
         { status: 503 }
-      )
-    }
-
-    // Check rate limit
-    const ip = getClientIp(request)
-    const rateLimitCheck = checkRateLimit(ip)
-
-    if (!rateLimitCheck.allowed) {
-      return NextResponse.json(
-        {
-          found: false,
-          error: 'Rate limit exceeded. Please try again later.',
-        },
-        {
-          status: 429,
-          headers: {
-            'Retry-After': String(rateLimitCheck.retryAfter),
-          },
-        }
       )
     }
 

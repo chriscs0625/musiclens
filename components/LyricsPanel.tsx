@@ -3,6 +3,11 @@
 import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Copy, Check } from 'lucide-react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 
 interface LyricsPanelProps {
   title: string
@@ -19,6 +24,27 @@ export function LyricsPanel({
 }: LyricsPanelProps) {
   const [copied, setCopied] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    if (isLoading || !lyrics) return;
+    
+    const lines = gsap.utils.toArray('.lyric-line');
+    
+    gsap.fromTo(lines, 
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.04,
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%'
+        }
+      }
+    )
+  }, { scope: containerRef, dependencies: [lyrics, isLoading] })
 
   const handleCopy = async () => {
     try {
@@ -42,7 +68,7 @@ export function LyricsPanel({
 
   return (
     <div
-      ref={panelRef}
+      ref={containerRef}
       className="flex-1 flex flex-col h-full min-h-96 rounded-2xl glass-strong overflow-hidden hover:border-slate-100/20 transition-all duration-300"
     >
       {/* Header with gradient */}
@@ -82,12 +108,7 @@ export function LyricsPanel({
             {lyrics.split('\n').map((line, idx) => (
               <p
                 key={idx}
-                className="text-slate-200 leading-relaxed whitespace-pre-wrap break-words text-base font-medium"
-                style={{
-                  animation: isLoading
-                    ? 'none'
-                    : `fade-in 0.4s ease-out ${idx * 0.02}s both`,
-                }}
+                className="lyric-line text-slate-200 leading-relaxed whitespace-pre-wrap break-words text-base font-medium"
               >
                 {line || '\u00A0'}
               </p>
