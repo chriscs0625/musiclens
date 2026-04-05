@@ -1,8 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { Badge } from '@/components/ui/badge'
 import type { Song } from '@/types/lyrics'
 
 interface MetadataBarProps {
@@ -18,59 +16,66 @@ export function MetadataBar({
   hasTamil = false,
   tamilScript = 'tanglish',
 }: MetadataBarProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    // GSAP animation will be applied here in the animation component
-    if (containerRef.current) {
-      containerRef.current.style.animation = 'fade-up 0.6s ease-out'
-    }
-  }, [])
-
   return (
-    <div
-      ref={containerRef}
-      className="w-full px-4 md:px-8 py-8"
-    >
-      <div className="max-w-6xl mx-auto glass-strong rounded-2xl p-6 md:p-8 flex gap-6 items-start">
+    <div className="w-full max-w-4xl mx-auto px-4 md:px-8 mt-8 mb-6">
+      <div className="bg-white border border-[var(--color-border)] rounded-[16px] p-[16px] md:px-[20px] flex items-center gap-4 flex-wrap md:flex-nowrap">
         {/* Album Art */}
-        {song.coverArt && (
-          <div className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 rounded-xl overflow-hidden border border-slate-200/20 shadow-lg">
-            <Image
-              src={song.coverArt}
-              alt={song.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 96px, 128px"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/20" />
+        <div className="flex-shrink-0 flex items-center gap-4 w-full md:w-auto">
+          {song.coverArt ? (
+            <div className="relative w-[56px] h-[56px] flex-shrink-0 rounded-[10px] overflow-hidden bg-[var(--color-card)]">
+              <Image
+                src={song.coverArt}
+                alt={song.title}
+                fill
+                className="object-cover"
+                sizes="56px"
+              />
+            </div>
+          ) : (
+            <div className="w-[56px] h-[56px] flex-shrink-0 rounded-[10px] bg-[var(--color-card)]" />
+          )}
+          
+          <div className="flex-1 min-w-0 flex flex-col justify-center md:hidden">
+            <h2 className="text-[17px] font-[600] text-[#1A1A1A] font-[family:var(--font-ui)] truncate leading-tight">
+              {song.title}
+            </h2>
+            <p className="text-[13px] text-[#6B6B6B] font-[family:var(--font-ui)] truncate mt-0.5">
+              {song.artist}
+              {song.album && ` • ${song.album}`}
+              {song.year && ` • ${song.year}`}
+            </p>
           </div>
-        )}
+        </div>
 
-        {/* Song Info */}
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl md:text-4xl font-syne font-bold text-white text-balance leading-tight mb-2">
+        {/* Song Info (Desktop) */}
+        <div className="hidden md:flex flex-1 min-w-0 flex-col justify-center">
+          <h2 className="text-[17px] font-[600] text-[#1A1A1A] font-[family:var(--font-ui)] truncate leading-tight">
             {song.title}
           </h2>
-          <p className="text-sm md:text-base text-slate-300 mb-4 font-medium">
+          <p className="text-[13px] text-[#6B6B6B] font-[family:var(--font-ui)] truncate mt-0.5">
             {song.artist}
             {song.album && ` • ${song.album}`}
             {song.year && ` • ${song.year}`}
           </p>
+        </div>
 
-          {/* Language Badges */}
-          <div className="flex flex-wrap gap-2">
-            {hasEnglish && (
-              <Badge className="bg-purple-600 text-white border-0 hover:bg-purple-700 text-xs md:text-sm px-3 py-1">
-                English Available
-              </Badge>
-            )}
-            {hasTamil && (
-              <Badge className="bg-cyan-600 text-white border-0 hover:bg-cyan-700 text-xs md:text-sm px-3 py-1">
-                {tamilScript === 'tamil' ? 'Tamil Script' : 'Tanglish'} Available
-              </Badge>
-            )}
-          </div>
+        {/* Language Badges */}
+        <div className="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0 justify-start md:justify-end">
+          {hasEnglish && (
+            <span className="inline-flex items-center px-3 h-6 rounded-[100px] bg-[#EAF3DE] text-[#3B6D11] text-[11px] font-[600] font-[family:var(--font-ui)] tracking-wide">
+              English
+            </span>
+          )}
+          {hasTamil && tamilScript === 'tamil' && (
+            <span className="inline-flex items-center px-3 h-6 rounded-[100px] bg-[#FAEEDA] text-[#854F0B] text-[11px] font-[600] font-[family:var(--font-ui)] tracking-wide">
+              Tamil Script
+            </span>
+          )}
+          {hasTamil && tamilScript === 'tanglish' && (
+            <span className="inline-flex items-center px-3 h-6 rounded-[100px] bg-[#E6F1FB] text-[#185FA5] text-[11px] font-[600] font-[family:var(--font-ui)] tracking-wide">
+              Tanglish
+            </span>
+          )}
         </div>
       </div>
     </div>
