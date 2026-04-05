@@ -69,13 +69,16 @@ export default function Home() {
   return (
     <main className="w-full min-h-screen overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full bg-[#FAFAF9] border-b border-[var(--color-border)] h-[56px]">
+      <header className="sticky top-0 z-40 w-full bg-[var(--bg-primary)] border-b border-[var(--color-border)] h-[56px]">
         <div className="max-w-6xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 rounded-[6px] bg-[var(--color-accent-tamil)]"></div>
-            <h1 className="text-[18px] style={{fontFamily: 'var(--font-display)'}} text-[#1A1A1A]">
+            <h1 className="text-[18px] style={{fontFamily: 'var(--font-display)'}} text-[var(--text-primary)]">
               LyricsLens
             </h1>
+          </div>
+          <div className="flex items-center">
+            <ThemeToggle />
           </div>
         </div>
       </header>
