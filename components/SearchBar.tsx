@@ -45,7 +45,7 @@ export function SearchBar({ onSearch, isLoading = false }: SearchBarProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             disabled={isLoading}
-            className="pl-4 pr-10 py-3 text-base md:text-lg bg-transparent border-0 placeholder:text-slate-500 focus:outline-none"
+            className="pl-4 pr-10 py-3 text-base md:text-lg bg-transparent border-0 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 rounded-full"
           />
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 pointer-events-none" />
         </div>
