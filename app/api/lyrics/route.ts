@@ -1,26 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { lyricsCache } from '@/lib/cache'
 import { detectScriptType, normalizeLyrics } from '@/lib/detectScript'
-import { searchTrack, getTrackLyrics, getTrackLyricsTranslation } from '@/lib/musixmatch'
+import { getTrackLyrics } from '@/lib/lyricsovh'
+import { searchTamilSong } from '@/lib/tamil'
 import { searchSong, extractMetadata } from '@/lib/genius'
-import type { LyricsResponse, SearchInput } from '@/types/lyrics'
+import type { LyricsResponse, SearchInput, Song } from '@/types/lyrics'
 
 export async function POST(request: NextRequest): Promise<NextResponse<LyricsResponse>> {
   try {
-    // Check if API keys are configured
-    const musixmatchKey = process.env.MUSIXMATCH_API_KEY
+    // Check if API keys are configured (Genius is needed)
     const geniusKey = process.env.GENIUS_ACCESS_TOKEN
 
-    if (!musixmatchKey || !geniusKey) {
-      console.error('[LyricsLens] Missing API keys:', {
-        hasMusixmatch: !!musixmatchKey,
-        hasGenius: !!geniusKey,
-      })
+    if (!geniusKey) {
+      console.error('[LyricsLens] Missing API keys:', { hasGenius: !!geniusKey })
       return NextResponse.json(
-        {
-          found: false,
-          error: 'API keys not configured. Please set MUSIXMATCH_API_KEY and GENIUS_ACCESS_TOKEN environment variables.',
-        },
+        { found: false, error: 'API keys not configured. Please set GENIUS_ACCESS_TOKEN.' },
         { status: 503 }
       )
     }
@@ -29,17 +23,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<LyricsRes
 
     // Validate input
     if (!body.query || body.query.trim().length === 0) {
-      return NextResponse.json(
-        { found: false, error: 'Query cannot be empty' },
-        { status: 400 }
-      )
+      return NextResponse.json({ found: false, error: 'Query cannot be empty' }, { status: 400 })
     }
 
     if (body.query.length > 200) {
-      return NextResponse.json(
-        { found: false, error: 'Query too long (max 200 characters)' },
-        { status: 400 }
-      )
+      return NextResponse.json({ found: false, error: 'Query too long (max 200 characters)' }, { status: 400 })
     }
 
     const query = body.query.trim()
@@ -51,111 +39,73 @@ export async function POST(request: NextRequest): Promise<NextResponse<LyricsRes
       return NextResponse.json(cached)
     }
 
-    // Search on Musixmatch
-    const mmTracks = await searchTrack(query, 3)
+    // Step 1: Search Genius first for metadata
+    const geniusSongs = await searchSong(query, 1)
+    let metadata: Song | undefined
+    if (geniusSongs.length > 0) {
+      metadata = extractMetadata(geniusSongs[0])
+    }
 
-    if (mmTracks.length === 0) {
-      // Fallback to Genius for metadata
-      const geniusSongs = await searchSong(query, 1)
-      if (geniusSongs.length > 0) {
-        const song = geniusSongs[0]
-        const metadata = extractMetadata(song)
-
-        const response: LyricsResponse = {
-          found: false,
-          error: 'Lyrics not found',
-          song: metadata,
+    // Step 2: Check Tamil local dataset
+    const tamilHit = await searchTamilSong(query)
+    
+    if (tamilHit) {
+      const response: LyricsResponse = {
+        found: true,
+        song: metadata || {
+          title: tamilHit.title,
+          artist: tamilHit.artist,
+          album: tamilHit.album,
+          year: tamilHit.year,
+        },
+        lyrics: {
+          tamil: {
+            content: `${tamilHit.transliteration}\n\n---\n\n${tamilHit.script}`,
+            script: 'tamil'
+          }
         }
-
-        lyricsCache.set(cacheKey, response)
-        return NextResponse.json(response)
       }
-
-      const response: LyricsResponse = {
-        found: false,
-        error: 'Song not found',
-      }
-
       lyricsCache.set(cacheKey, response)
       return NextResponse.json(response)
     }
 
-    const track = mmTracks[0]
-    const [englishLyrics, tamilLyrics, geniusMeta] = await Promise.allSettled([
-      getTrackLyrics(track.track_id),
-      getTrackLyricsTranslation(track.track_id, 'ta'),
-      searchSong(query, 1),
-    ])
-
-    // Extract English lyrics
-    const englishLyricsText =
-      englishLyrics.status === 'fulfilled' && englishLyrics.value
-        ? normalizeLyrics(englishLyrics.value)
-        : null
-
-    // Extract Tamil lyrics
-    let tamilLyricsText: string | null = null
-    let tamilScript = 'none'
-    if (tamilLyrics.status === 'fulfilled' && tamilLyrics.value) {
-      tamilLyricsText = normalizeLyrics(tamilLyrics.value)
-      tamilScript = detectScriptType(tamilLyricsText)
-    }
-
-    // Extract metadata from Genius if available
-    let metadata = {
-      title: track.track_name,
-      artist: track.artist_name,
-      album: track.album_name,
-      coverArt: track.album_coverart_100x100,
-    }
-
-    if (
-      geniusMeta.status === 'fulfilled' &&
-      geniusMeta.value &&
-      geniusMeta.value.length > 0
-    ) {
-      const geniusSong = geniusMeta.value[0]
-      metadata = {
-        ...metadata,
-        ...extractMetadata(geniusSong),
-      }
-    }
-
-    if (!englishLyricsText && !tamilLyricsText) {
-      const response: LyricsResponse = {
-        found: false,
-        error: 'Lyrics not available',
-        song: metadata,
-      }
-
+    // Step 3: Fallback checks
+    if (!metadata || !metadata.title || !metadata.artist) {
+      const response: LyricsResponse = { found: false, error: 'Song not found' }
       lyricsCache.set(cacheKey, response)
       return NextResponse.json(response)
     }
+
+    // Step 4: Fetch from lyrics.ovh
+    const title = metadata.title.replace(/\(.*\)/g, '').trim()
+    const lyricsData = await getTrackLyrics(metadata.artist, title)
+
+    if (!lyricsData) {
+      const response: LyricsResponse = { found: false, error: 'Lyrics not found', song: metadata }
+      lyricsCache.set(cacheKey, response)
+      return NextResponse.json(response)
+    }
+
+    // Step 5: Format response
+    const normalized = normalizeLyrics(lyricsData)
+    const scriptType = detectScriptType(normalized)
 
     const response: LyricsResponse = {
       found: true,
       song: metadata,
-      lyrics: {
-        english: englishLyricsText || undefined,
-        tamil: tamilLyricsText
-          ? {
-              content: tamilLyricsText,
-              script: tamilScript as 'tanglish' | 'tamil' | 'none',
-            }
-          : undefined,
-      },
+      lyrics: {}
+    }
+
+    if (scriptType === 'tamil' || scriptType === 'tanglish') {
+      response.lyrics!.tamil = { content: normalized, script: scriptType }
+    } else {
+      response.lyrics!.english = normalized
     }
 
     lyricsCache.set(cacheKey, response)
     return NextResponse.json(response)
   } catch (error) {
     console.error('[LyricsLens] API error:', error)
-    return NextResponse.json(
-      {
-        found: false,
-        error: 'Internal server error',
-      },
-      { status: 500 }
-    )
+    return NextResponse.json({ found: false, error: 'Internal server error' }, { status: 500 })
   }
 }
