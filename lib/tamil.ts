@@ -37,30 +37,38 @@ export async function searchTamilSong(query: string): Promise<TamilSong | null> 
   
   if (!query || songs.length === 0) return null
 
-  const normalizedQueryTokens = tokenize(query)
-  if (normalizedQueryTokens.length === 0) return null
+  const normalizedQuery = normalizeQuery(query)
+  if (!normalizedQuery) return null
 
-  // Score base search
-  let bestMatch: TamilSong | null = null
-  let highestScore = 0
+  const qTokens = tokenize(query)
 
   for (const song of songs) {
     const titleTokens = tokenize(song.title)
     const artistTokens = tokenize(song.artist)
-    const combinedTokens = new Set([...titleTokens, ...artistTokens])
 
-    let matches = 0
-    for (const qToken of normalizedQueryTokens) {
-      if (Array.from(combinedTokens).some(t => t.includes(qToken) || qToken.includes(t))) {
-        matches++
+    let titleMatchScore = 0
+    for (const t of titleTokens) {
+      if (qTokens.some(qt => qt.includes(t) || t.includes(qt))) {
+        titleMatchScore++
       }
     }
+    const hasFullTitle = titleMatchScore >= titleTokens.length
 
-    if (matches > highestScore && matches >= Math.ceil(normalizedQueryTokens.length * 0.5)) {
-      highestScore = matches
-      bestMatch = song
+    let artistMatchScore = 0
+    for (const a of artistTokens) {
+      if (qTokens.some(qt => qt.includes(a) || a.includes(qt))) {
+        artistMatchScore++
+      }
+    }
+    const hasArtist = artistMatchScore > 0 // Matches at least one piece of the artist's name
+
+    // Exact title match (query and title are the same tokens without extra words, or just strict equality)
+    const isExactTitle = hasFullTitle && qTokens.length === titleTokens.length
+
+    if (isExactTitle || (hasFullTitle && hasArtist)) {
+      return song
     }
   }
 
-  return bestMatch
+  return null
 }
