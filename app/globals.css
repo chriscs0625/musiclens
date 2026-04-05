@@ -5,6 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --bg-primary: #FAFAF9;
+  --bg-card: #F5F3F0;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B6B6B;
+  --border-color: #E2DED9;
+
   --color-accent-tamil: #E8841A;
   --color-accent-english: #378ADD;
   --color-card: #F5F3F0;
@@ -14,10 +20,18 @@
   --font-ui: 'Plus Jakarta Sans', sans-serif;
 }
 
+.dark {
+  --bg-primary: #0F0F0F;
+  --bg-card: #1A1A1A;
+  --text-primary: #F0EFED;
+  --text-secondary: #8A8A8A;
+  --border-color: #2A2A2A;
+}
+
 @layer base {
   body {
-    background-color: #FAFAF9;
-    color: #1A1A1A;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     font-family: var(--font-ui);
   }
 }
