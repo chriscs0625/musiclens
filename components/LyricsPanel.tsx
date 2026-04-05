@@ -38,7 +38,7 @@ export function LyricsPanel({
         y: 0,
         duration: 0.5,
         stagger: 0.04,
-        clearProps: 'all',
+        clearProps: 'opacity',
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top 85%'
@@ -110,6 +110,7 @@ export function LyricsPanel({
               <p
                 key={idx}
                 className="lyric-line text-slate-200 leading-relaxed whitespace-pre-wrap break-words text-base font-medium"
+                style={{ opacity: 0 }}
               >
                 {line || '\u00A0'}
               </p>
