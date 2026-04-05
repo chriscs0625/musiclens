@@ -38,6 +38,7 @@ export function LyricsPanel({
         y: 0,
         duration: 0.5,
         stagger: 0.04,
+        clearProps: 'all',
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top 85%'

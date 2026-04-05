@@ -6,6 +6,7 @@ import { SearchBar } from '@/components/SearchBar'
 import { MetadataBar } from '@/components/MetadataBar'
 import { DualPanelLayout } from '@/components/DualPanelLayout'
 import { RecentSearches, useSearchHistory } from '@/components/RecentSearches'
+import { useGSAP } from '@gsap/react'
 import { animatePanelSlideIn } from '@/lib/animations'
 import { Music } from 'lucide-react'
 import type { LyricsResponse } from '@/types/lyrics'
@@ -19,47 +20,22 @@ export default function Home() {
   const { addSearch } = useSearchHistory()
 
   // Initialize hero animation on mount
-  useEffect(() => {
-    // Wait for DOM to be ready
-    const timer = setTimeout(() => {
-      const timeline = gsap.timeline()
-
-      // Check if elements exist before animating
-      if (document.querySelector('.hero-headline')) {
-        timeline.from('.hero-headline', {
-          opacity: 0,
-          y: 30,
-          duration: 0.8,
-        })
-      }
-
-      if (document.querySelector('.hero-description')) {
-        timeline.from(
-          '.hero-description',
-          {
-            opacity: 0,
-            y: 20,
-            duration: 0.6,
-          },
-          '-=0.4'
-        )
-      }
-
-      if (document.querySelector('.hero-search')) {
-        timeline.from(
-          '.hero-search',
-          {
-            opacity: 0,
-            y: 20,
-            duration: 0.6,
-          },
-          '-=0.4'
-        )
-      }
-    }, 100)
-
-    return () => clearTimeout(timer)
-  }, [])
+  useGSAP(() => {
+    const ctx = gsap.context(() => {
+      const elements = ['.hero-headline', '.hero-description', '.hero-search']
+      gsap.set(elements, { opacity: 1 })
+      gsap.from(elements, {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power2.out',
+        clearProps: 'all',
+      })
+    }, heroRef)
+    
+    return () => ctx.revert()
+  }, { scope: heroRef })
 
   // Animate results when they appear
   useEffect(() => {
@@ -139,25 +115,25 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="w-full py-12 md:py-20 px-4 md:px-8">
+      <section ref={heroRef} className="w-full py-12 md:py-20 px-4 md:px-8">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Headline */}
           <div className="text-center space-y-4">
-            <h2 className="hero-headline text-4xl md:text-5xl lg:text-6xl font-syne font-bold text-slate-100 text-balance leading-tight">
+            <h2 data-gsap className="hero-headline text-4xl md:text-5xl lg:text-6xl font-syne font-bold text-slate-100 text-balance leading-tight">
               Find the lyrics.
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-violet-500">
                 In your language.
               </span>
             </h2>
-            <p className="hero-description text-lg text-slate-400 text-balance max-w-2xl mx-auto">
+            <p data-gsap className="hero-description text-lg text-slate-400 text-balance max-w-2xl mx-auto">
               Search any song, movie, or album and get lyrics in English and Tamil,
               side by side.
             </p>
           </div>
 
           {/* Search Bar */}
-          <div className="flex justify-center hero-search">
+          <div data-gsap className="flex justify-center hero-search">
             <SearchBar onSearch={handleSearch} isLoading={isLoading} />
           </div>
         </div>
