@@ -5,6 +5,7 @@ import { SearchBar } from '@/components/SearchBar'
 import { MetadataBar } from '@/components/MetadataBar'
 import { DualPanelLayout } from '@/components/DualPanelLayout'
 import { RecentSearches, useSearchHistory } from '@/components/RecentSearches'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { Music } from 'lucide-react'
 import type { LyricsResponse } from '@/types/lyrics'
 
