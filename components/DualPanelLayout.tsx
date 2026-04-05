@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs' 
 import { LyricsPanel } from './LyricsPanel'
 import type { ScriptType } from '@/types/lyrics'
 
@@ -34,15 +34,15 @@ export function DualPanelLayout({
     parsedTamilScript = parts[1].trim()
   }
 
-  const currentTamilDisplay = 
+  const currentTamilDisplay =
     tamilDisplayMode === 'tamil' && parsedTamilScript ? parsedTamilScript : parsedTanglish
 
   if (!showEnglish && !showTamil && !isLoading) {
     return (
       <div className="flex items-center justify-center py-20 px-4">
         <div className="text-center max-w-md">
-          <p className="text-lg text-slate-400 mb-2">No lyrics found</p>
-          <p className="text-sm text-slate-500">
+          <p className="text-[15px] font-[family:var(--font-ui)] text-[#1A1A1A] mb-2">No lyrics found</p>        
+          <p className="text-[14px] text-[#6B6B6B] font-[family:var(--font-ui)]">
             Try searching for a different song or movie
           </p>
         </div>
@@ -59,7 +59,7 @@ export function DualPanelLayout({
             <LyricsPanel
               title="English Lyrics"
               lyrics={englishLyrics || ''}
-              accentColor="violet"
+              type="english"
               isLoading={isLoading}
             />
           )}
@@ -74,16 +74,16 @@ export function DualPanelLayout({
                     }
                     className="w-full"
                   >
-                    <TabsList className="grid w-full grid-cols-2 glass rounded-full p-1 h-auto">
+                    <TabsList className="grid w-full grid-cols-2 bg-[#F5F3F0] rounded-[100px] p-1 h-auto">
                       <TabsTrigger
                         value="tanglish"
-                        className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+                        className="rounded-[100px] font-[family:var(--font-ui)] text-[13px] font-[500] data-[state=active]:bg-white data-[state=active]:text-[#1A1A1A] data-[state=active]:shadow-sm text-[#6B6B6B]"
                       >
                         Tanglish
                       </TabsTrigger>
                       <TabsTrigger
                         value="tamil"
-                        className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+                        className="rounded-[100px] font-[family:var(--font-ui)] text-[13px] font-[500] data-[state=active]:bg-white data-[state=active]:text-[#1A1A1A] data-[state=active]:shadow-sm text-[#6B6B6B]"
                       >
                         Tamil Script
                       </TabsTrigger>
@@ -92,9 +92,9 @@ export function DualPanelLayout({
                 </div>
               )}
               <LyricsPanel
-                title={tamilDisplayMode === 'tamil' ? 'Tamil Lyrics' : 'Tanglish Lyrics'}
+                title={tamilDisplayMode === 'tamil' ? 'TAMIL' : 'TAMIL (TANGLISH)'}
                 lyrics={currentTamilDisplay || ''}
-                accentColor="amber"
+                type="tamil"
                 isLoading={isLoading}
               />
             </div>
@@ -105,9 +105,9 @@ export function DualPanelLayout({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {/* English Panel */}
           <LyricsPanel
-            title="English Lyrics"
+            title="English"
             lyrics={englishLyrics || ''}
-            accentColor="violet"
+            type="english"
             isLoading={isLoading}
           />
 
@@ -122,16 +122,16 @@ export function DualPanelLayout({
                   }
                   className="w-full"
                 >
-                  <TabsList className="grid w-full grid-cols-2 glass rounded-full p-1 h-auto">
+                  <TabsList className="grid w-[240px] grid-cols-2 bg-[#F5F3F0] rounded-[100px] p-1 h-auto mx-auto lg:mx-0">
                     <TabsTrigger
                       value="tanglish"
-                      className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+                      className="rounded-[100px] font-[family:var(--font-ui)] text-[13px] font-[500] data-[state=active]:bg-white data-[state=active]:text-[#1A1A1A] data-[state=active]:shadow-sm text-[#6B6B6B]"
                     >
                       Tanglish
                     </TabsTrigger>
                     <TabsTrigger
                       value="tamil"
-                      className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+                      className="rounded-[100px] font-[family:var(--font-ui)] text-[13px] font-[500] data-[state=active]:bg-white data-[state=active]:text-[#1A1A1A] data-[state=active]:shadow-sm text-[#6B6B6B]"
                     >
                       Tamil Script
                     </TabsTrigger>
@@ -142,10 +142,10 @@ export function DualPanelLayout({
 
             <LyricsPanel
               title={
-                tamilDisplayMode === 'tamil' ? 'Tamil Lyrics' : 'Tanglish Lyrics'
+                tamilDisplayMode === 'tamil' ? 'Tamil' : 'Tamil (Tanglish)'
               }
               lyrics={currentTamilDisplay || ''}
-              accentColor="amber"
+              type="tamil"
               isLoading={isLoading}
             />
           </div>

@@ -1,88 +1,54 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Copy, Check } from 'lucide-react'
-
 interface LyricsPanelProps {
   title: string
   lyrics: string
-  accentColor?: 'violet' | 'amber'
+  type: 'english' | 'tamil'
   isLoading?: boolean
 }
 
 export function LyricsPanel({
   title,
   lyrics,
-  accentColor = 'violet',
+  type,
   isLoading = false,
 }: LyricsPanelProps) {
-  const [copied, setCopied] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(lyrics)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
-      console.error('Failed to copy:', error)
-    }
-  }
-
-  const accentColorMap = {
-    violet: 'from-purple-600 to-violet-600',
-    amber: 'from-cyan-600 to-blue-600',
-  }
-
-  const accentTextMap = {
-    violet: 'text-purple-300',
-    amber: 'text-cyan-300',
-  }
+  const isTamil = type === 'tamil'
 
   return (
     <div
-      ref={containerRef}
-      className="flex-1 flex flex-col h-full min-h-96 rounded-2xl glass-strong overflow-hidden hover:border-slate-100/20 transition-all duration-300"
+      className={`flex-1 flex flex-col h-full bg-white rounded-[16px] p-[24px] ${
+        isTamil
+          ? 'border border-[var(--color-border)] border-l-[3px] border-l-[var(--color-accent-tamil)]'
+          : 'border border-[var(--color-border)]'
+      }`}
     >
-      {/* Header with gradient */}
-      <div className={`flex items-center justify-between px-6 py-4 bg-gradient-to-r ${accentColorMap[accentColor]} bg-opacity-10 border-b border-slate-200/10`}>
-        <h3 className={`text-lg font-syne font-bold ${accentTextMap[accentColor]}`}>
+      <div className="mb-[24px]">
+        <h3
+          className={`text-[10px] uppercase tracking-[0.08em] font-[600] font-[family:var(--font-ui)] ${
+            isTamil ? 'text-[var(--color-accent-tamil)]' : 'text-[var(--color-accent-english)]'
+          }`}
+        >
           {title}
         </h3>
-
-        <Button
-          onClick={handleCopy}
-          disabled={isLoading || !lyrics}
-          size="sm"
-          className={`rounded-lg bg-gradient-to-r ${accentColorMap[accentColor]} hover:from-purple-700 hover:to-violet-700 text-white border-0 transition-all`}
-          title="Copy to clipboard"
-        >
-          {copied ? (
-            <Check className="w-4 h-4" />
-          ) : (
-            <Copy className="w-4 h-4" />
-          )}
-        </Button>
       </div>
 
-      {/* Lyrics Content */}
-      <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
+      <div className="flex-1">
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-4 pt-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className={`h-4 ${i % 3 === 0 ? 'w-3/4' : 'w-full'} bg-gradient-to-r from-slate-600/50 to-slate-700/50 rounded animate-pulse`}
+                className={`h-[14px] ${i % 3 === 0 ? 'w-3/4' : 'w-full'} bg-[#E2DED9]/50 rounded animate-pulse`}
               />
             ))}
           </div>
         ) : lyrics ? (
-          <div className="space-y-4">
+          <div className="space-y-[0px]">
             {lyrics.split('\n').map((line, idx) => (
               <p
                 key={idx}
-                className="lyric-line text-slate-200 text-base leading-relaxed py-1"
+                className="text-[14px] leading-[2] text-[#2A2A2A] font-[family:var(--font-ui)]"
               >
                 {line || '\u00A0'}
               </p>
@@ -90,7 +56,7 @@ export function LyricsPanel({
           </div>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-slate-400">No lyrics available</p>
+            <p className="text-[#6B6B6B] font-[family:var(--font-ui)] text-[14px]">No lyrics available</p>
           </div>
         )}
       </div>
