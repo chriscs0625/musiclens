@@ -20,39 +20,60 @@ export default function Home() {
 
   // Initialize hero animation on mount
   useEffect(() => {
-    const timeline = gsap.timeline()
+    // Wait for DOM to be ready
+    const timer = setTimeout(() => {
+      const timeline = gsap.timeline()
 
-    // Animate hero elements
-    timeline
-      .from('.hero-headline', {
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-      })
-      .from(
-        '.hero-description',
-        {
+      // Check if elements exist before animating
+      if (document.querySelector('.hero-headline')) {
+        timeline.from('.hero-headline', {
           opacity: 0,
-          y: 20,
-          duration: 0.6,
-        },
-        '-=0.4'
-      )
-      .from(
-        '.hero-search',
-        {
-          opacity: 0,
-          y: 20,
-          duration: 0.6,
-        },
-        '-=0.4'
-      )
+          y: 30,
+          duration: 0.8,
+        })
+      }
+
+      if (document.querySelector('.hero-description')) {
+        timeline.from(
+          '.hero-description',
+          {
+            opacity: 0,
+            y: 20,
+            duration: 0.6,
+          },
+          '-=0.4'
+        )
+      }
+
+      if (document.querySelector('.hero-search')) {
+        timeline.from(
+          '.hero-search',
+          {
+            opacity: 0,
+            y: 20,
+            duration: 0.6,
+          },
+          '-=0.4'
+        )
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [])
 
   // Animate results when they appear
   useEffect(() => {
     if (result && contentRef.current) {
-      animatePanelSlideIn()
+      // Delay animation to ensure DOM elements are rendered
+      const timer = setTimeout(() => {
+        try {
+          animatePanelSlideIn()
+        } catch (err) {
+          console.log('[v0] Animation error (non-critical):', err)
+        }
+      }, 100)
+
+      return () => clearTimeout(timer)
     }
   }, [result])
 
@@ -99,17 +120,19 @@ export default function Home() {
   }
 
   return (
-    <main className="w-full min-h-screen bg-slate-950 overflow-x-hidden">
+    <main className="w-full min-h-screen overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 w-full glass border-b border-slate-200/10 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Music className="w-6 h-6 text-violet-500" />
-            <h1 className="text-xl md:text-2xl font-syne font-bold text-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-pink-600">
+              <Music className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-xl md:text-2xl font-syne font-bold text-white">
               LyricsLens
             </h1>
           </div>
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-slate-400 font-medium">
             Bilingual Song Lyrics
           </div>
         </div>
@@ -171,8 +194,8 @@ export default function Home() {
               />
             ) : (
               <div className="max-w-2xl mx-auto text-center py-16">
-                <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-8">
-                  <Music className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                <div className="glass-strong rounded-2xl p-8">
+                  <Music className="w-12 h-12 text-slate-500 mx-auto mb-4" />
                   <h3 className="text-xl font-syne font-bold text-slate-200 mb-2">
                     {result.error || 'Lyrics not found'}
                   </h3>
@@ -191,8 +214,16 @@ export default function Home() {
       {error && !result?.found && (
         <section className="px-4 md:px-8 pb-12">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-red-950/50 border border-red-900/50 rounded-lg p-6 text-center">
-              <p className="text-red-300">{error}</p>
+            <div className="glass-strong rounded-2xl p-6 border border-red-500/30 bg-red-500/10">
+              <div className="text-center">
+                <h3 className="text-lg font-syne font-bold text-red-300 mb-2">Error</h3>
+                <p className="text-red-200 text-sm">{error}</p>
+                {error.includes('API keys') && (
+                  <p className="text-red-300/70 text-xs mt-3">
+                    Please configure the API keys in your project settings (top-right settings icon → Vars).
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -202,8 +233,8 @@ export default function Home() {
       <RecentSearches onSelectSearch={handleRecentSearch} />
 
       {/* Footer */}
-      <footer className="w-full border-t border-slate-800 bg-slate-950/50 py-8 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto text-center text-sm text-slate-500">
+      <footer className="w-full border-t border-slate-200/10 glass py-8 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto text-center text-sm text-slate-400">
           <p>
             Powered by Musixmatch API & Genius. Built with Next.js, Tailwind CSS,
             and GSAP.

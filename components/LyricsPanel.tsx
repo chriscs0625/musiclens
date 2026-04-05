@@ -31,36 +31,35 @@ export function LyricsPanel({
   }
 
   const accentColorMap = {
-    violet: 'text-violet-400 border-violet-500/30 bg-violet-500/5',
-    amber: 'text-amber-400 border-amber-500/30 bg-amber-500/5',
+    violet: 'from-purple-600 to-violet-600',
+    amber: 'from-cyan-600 to-blue-600',
   }
 
-  const glowMap = {
-    violet: 'hover:shadow-glow-violet hover:border-violet-500/50',
-    amber: 'hover:shadow-glow-amber hover:border-amber-500/50',
+  const accentTextMap = {
+    violet: 'text-purple-300',
+    amber: 'text-cyan-300',
   }
 
   return (
     <div
       ref={panelRef}
-      className="flex-1 flex flex-col h-full min-h-96 rounded-xl border border-slate-700/50 bg-slate-900/30 backdrop-blur-sm overflow-hidden hover:border-slate-600/50 transition-all duration-300"
+      className="flex-1 flex flex-col h-full min-h-96 rounded-2xl glass-strong overflow-hidden hover:border-slate-100/20 transition-all duration-300"
     >
-      {/* Header */}
-      <div className={`flex items-center justify-between px-6 py-4 border-b ${accentColorMap[accentColor]} transition-colors duration-300`}>
-        <h3 className={`text-lg font-syne font-bold ${accentColorMap[accentColor]}`}>
+      {/* Header with gradient */}
+      <div className={`flex items-center justify-between px-6 py-4 bg-gradient-to-r ${accentColorMap[accentColor]} bg-opacity-10 border-b border-slate-200/10`}>
+        <h3 className={`text-lg font-syne font-bold ${accentTextMap[accentColor]}`}>
           {title}
         </h3>
 
         <Button
           onClick={handleCopy}
           disabled={isLoading || !lyrics}
-          variant="ghost"
           size="sm"
-          className={`text-slate-400 hover:text-slate-100 ${glowMap[accentColor]} transition-colors`}
+          className={`rounded-lg bg-gradient-to-r ${accentColorMap[accentColor]} hover:from-purple-700 hover:to-violet-700 text-white border-0 transition-all`}
           title="Copy to clipboard"
         >
           {copied ? (
-            <Check className="w-4 h-4 text-green-400" />
+            <Check className="w-4 h-4" />
           ) : (
             <Copy className="w-4 h-4" />
           )}
@@ -74,16 +73,16 @@ export function LyricsPanel({
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className={`h-4 ${i % 3 === 0 ? 'w-3/4' : 'w-full'} bg-slate-700/50 rounded animate-pulse`}
+                className={`h-4 ${i % 3 === 0 ? 'w-3/4' : 'w-full'} bg-gradient-to-r from-slate-600/50 to-slate-700/50 rounded animate-pulse`}
               />
             ))}
           </div>
         ) : lyrics ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {lyrics.split('\n').map((line, idx) => (
               <p
                 key={idx}
-                className="text-slate-300 leading-relaxed whitespace-pre-wrap break-words text-base"
+                className="text-slate-200 leading-relaxed whitespace-pre-wrap break-words text-base font-medium"
                 style={{
                   animation: isLoading
                     ? 'none'
@@ -95,8 +94,8 @@ export function LyricsPanel({
             ))}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full text-slate-500">
-            <p>No lyrics available</p>
+          <div className="flex items-center justify-center h-full">
+            <p className="text-slate-400">No lyrics available</p>
           </div>
         )}
       </div>

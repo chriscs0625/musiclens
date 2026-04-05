@@ -46,6 +46,24 @@ function getClientIp(request: NextRequest): string {
 
 export async function POST(request: NextRequest): Promise<NextResponse<LyricsResponse>> {
   try {
+    // Check if API keys are configured
+    const musixmatchKey = process.env.MUSIXMATCH_API_KEY
+    const geniusKey = process.env.GENIUS_ACCESS_TOKEN
+
+    if (!musixmatchKey || !geniusKey) {
+      console.error('[LyricsLens] Missing API keys:', {
+        hasMusixmatch: !!musixmatchKey,
+        hasGenius: !!geniusKey,
+      })
+      return NextResponse.json(
+        {
+          found: false,
+          error: 'API keys not configured. Please set MUSIXMATCH_API_KEY and GENIUS_ACCESS_TOKEN environment variables.',
+        },
+        { status: 503 }
+      )
+    }
+
     // Check rate limit
     const ip = getClientIp(request)
     const rateLimitCheck = checkRateLimit(ip)

@@ -82,16 +82,16 @@ export function DualPanelLayout({
                   }
                   className="w-full"
                 >
-                  <TabsList className="grid w-full grid-cols-2 bg-slate-900/50 border border-slate-700/50 rounded-lg">
+                  <TabsList className="grid w-full grid-cols-2 glass rounded-full p-1 h-auto">
                     <TabsTrigger
                       value="tanglish"
-                      className="data-[state=active]:bg-amber-600/20 data-[state=active]:text-amber-300"
+                      className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
                     >
                       Tanglish
                     </TabsTrigger>
                     <TabsTrigger
                       value="tamil"
-                      className="data-[state=active]:bg-amber-600/20 data-[state=active]:text-amber-300"
+                      className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
                     >
                       Tamil Script
                     </TabsTrigger>

@@ -1,31 +1,26 @@
 import { useEffect } from 'react'
 import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
-
-// Register ScrollTrigger plugin
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
-}
 
 /**
- * Hook to initialize GSAP and ScrollTrigger
+ * Hook to initialize GSAP
  * Should be called once in the root layout
  */
 export function useGSAPSetup() {
   useEffect(() => {
-    // Set default ease
+    // Set default ease and other GSAP defaults
     gsap.defaults({ ease: 'power3.inOut' })
 
-    // Refresh ScrollTrigger on window resize
+    // Prevent errors on SSR
+    if (typeof window === 'undefined') return
+
     const handleResize = () => {
-      ScrollTrigger.refresh()
+      // Trigger any resize-dependent animations here
     }
 
     window.addEventListener('resize', handleResize)
 
     return () => {
       window.removeEventListener('resize', handleResize)
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
     }
   }, [])
 }

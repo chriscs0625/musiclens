@@ -64,27 +64,33 @@ export function animateSearchBlur(element: HTMLElement) {
 export function animatePanelSlideIn() {
   const timeline = gsap.timeline()
 
-  // Metadata bar
-  timeline.from(
-    '[data-lyrics-metadata]',
-    {
-      opacity: 0,
-      y: 20,
-      duration: 0.6,
-    }
-  )
+  // Metadata bar - only animate if element exists
+  const metadataElement = document.querySelector('[data-lyrics-metadata]')
+  if (metadataElement) {
+    timeline.from(
+      '[data-lyrics-metadata]',
+      {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+      }
+    )
+  }
 
-  // Lyrics panels
-  timeline.from(
-    '[data-lyrics-panel]',
-    {
-      opacity: 0,
-      y: 20,
-      stagger: 0.2,
-      duration: 0.6,
-    },
-    '-=0.4'
-  )
+  // Lyrics panels - only animate if elements exist
+  const panelElements = document.querySelectorAll('[data-lyrics-panel]')
+  if (panelElements.length > 0) {
+    timeline.from(
+      '[data-lyrics-panel]',
+      {
+        opacity: 0,
+        y: 20,
+        stagger: 0.2,
+        duration: 0.6,
+      },
+      '-=0.4'
+    )
+  }
 
   return timeline
 }

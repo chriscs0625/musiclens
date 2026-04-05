@@ -67,42 +67,44 @@ export function RecentSearches({ onSelectSearch, maxItems = 5 }: RecentSearchesP
   }
 
   return (
-    <div className="w-full py-6 px-4 md:px-8 border-t border-slate-800 bg-slate-900/30 backdrop-blur-sm">
+    <div className="w-full py-8 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-slate-400 flex items-center gap-2">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-sm font-syne font-bold text-slate-300 flex items-center gap-2 uppercase tracking-wider">
             <Clock className="w-4 h-4" />
             Recent Searches
           </h3>
           {searches.length > 0 && (
             <button
               onClick={clearAll}
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+              className="text-xs text-slate-400 hover:text-slate-200 transition-colors font-medium"
             >
               Clear all
             </button>
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           {searches.map(item => (
             <div
               key={item.timestamp}
-              className="group flex items-center gap-1 px-3 py-1.5 bg-slate-800/50 border border-slate-700/50 rounded-full hover:border-slate-600/50 transition-all duration-200"
+              className="group glass rounded-full px-4 py-2 hover:border-purple-500/50 transition-all duration-200 hover:bg-purple-500/10 cursor-pointer"
             >
-              <button
-                onClick={() => onSelectSearch(item.query)}
-                className="text-sm text-slate-300 hover:text-slate-100 transition-colors font-medium"
-              >
-                {item.query}
-              </button>
-              <button
-                onClick={() => removeSearch(item.query)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 p-0.5 hover:bg-slate-700/50 rounded-full"
-                title="Remove"
-              >
-                <X className="w-3 h-3 text-slate-500 hover:text-slate-300" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => onSelectSearch(item.query)}
+                  className="text-sm text-slate-200 hover:text-white transition-colors font-medium"
+                >
+                  {item.query}
+                </button>
+                <button
+                  onClick={() => removeSearch(item.query)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-slate-500/30 rounded-full"
+                  title="Remove"
+                >
+                  <X className="w-3 h-3 text-slate-400 hover:text-slate-200" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
