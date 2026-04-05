@@ -1,13 +1,10 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import gsap from 'gsap'
 import { SearchBar } from '@/components/SearchBar'
 import { MetadataBar } from '@/components/MetadataBar'
 import { DualPanelLayout } from '@/components/DualPanelLayout'
 import { RecentSearches, useSearchHistory } from '@/components/RecentSearches'
-import { useGSAP } from '@gsap/react'
-import { animatePanelSlideIn } from '@/lib/animations'
 import { Music } from 'lucide-react'
 import type { LyricsResponse } from '@/types/lyrics'
 
@@ -16,42 +13,15 @@ export default function Home() {
   const [result, setResult] = useState<LyricsResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const heroRef = useRef<HTMLDivElement>(null)
   const { addSearch } = useSearchHistory()
 
-  // Initialize hero animation on mount
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      const elements = ['.hero-headline', '.hero-description', '.hero-search']
-      gsap.set(elements, { opacity: 1 })
-      gsap.from(elements, {
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'power2.out',
-        clearProps: 'all',
-      })
-    }, heroRef)
-    
-    return () => ctx.revert()
-  }, { scope: heroRef })
-
-  // Animate results when they appear
+  // Animate results
   useEffect(() => {
     if (result && contentRef.current) {
-      // Delay animation to ensure DOM elements are rendered
-      const timer = setTimeout(() => {
-        try {
-          animatePanelSlideIn()
-        } catch (err) {
-          console.log('[v0] Animation error (non-critical):', err)
-        }
-      }, 100)
-
-      return () => clearTimeout(timer)
+      return () => {}
     }
   }, [result])
+
 
   const handleSearch = async (query: string) => {
     setIsLoading(true)
@@ -98,42 +68,32 @@ export default function Home() {
   return (
     <main className="w-full min-h-screen overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full glass border-b border-slate-200/10 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-40 w-full bg-[#FAFAF9] border-b border-[var(--color-border)] h-[56px]">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-pink-600">
-              <Music className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-xl md:text-2xl font-syne font-bold text-white">
+            <div className="w-4 h-4 rounded-[6px] bg-[var(--color-accent-tamil)]"></div>
+            <h1 className="text-[18px] style={{fontFamily: 'var(--font-display)'}} text-[#1A1A1A]">
               LyricsLens
             </h1>
-          </div>
-          <div className="text-xs text-slate-400 font-medium">
-            Bilingual Song Lyrics
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="w-full py-12 md:py-20 px-4 md:px-8">
+      <section className="w-full pt-[80px] pb-12 md:pb-20 px-4 md:px-8 animate-in fade-in duration-700">
         <div className="max-w-4xl mx-auto space-y-8">
-          {/* Headline */}
           <div className="text-center space-y-4">
-            <h2 data-gsap className="hero-headline text-4xl md:text-5xl lg:text-6xl font-syne font-bold text-slate-100 text-balance leading-tight">
-              Find the lyrics.
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-violet-500">
+            <h2 className="text-[36px] md:text-[52px] style={{fontFamily: 'var(--font-display)'}} font-normal text-[#1A1A1A] leading-tight">
+              Find the lyrics.<br />
+              <span className="text-[var(--color-accent-tamil)]">
                 In your language.
               </span>
             </h2>
-            <p data-gsap className="hero-description text-lg text-slate-400 text-balance max-w-2xl mx-auto">
-              Search any song, movie, or album and get lyrics in English and Tamil,
-              side by side.
+            <p className="text-[15px] text-[#6B6B6B] style={{fontFamily: 'var(--font-ui)'}} max-w-2xl mx-auto">
+              Search any song, movie, or album and get lyrics in English and Tamil, side by side.
             </p>
           </div>
-
-          {/* Search Bar */}
-          <div data-gsap className="flex justify-center hero-search">
+          <div className="flex justify-center">
             <SearchBar onSearch={handleSearch} isLoading={isLoading} />
           </div>
         </div>
