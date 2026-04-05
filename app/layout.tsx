@@ -42,10 +42,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body 
         className={`${syne.variable} ${dmSans.variable} ${notoTamilSans.variable} text-slate-100 font-sans antialiased`}
-        style={{
-          background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
-          backgroundAttachment: 'fixed',
-        }}
       >
         <Providers>
           {children}
