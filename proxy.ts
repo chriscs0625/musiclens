@@ -5,7 +5,7 @@ const RATE_LIMIT = 20
 const WINDOW_MS = 60_000
 const ipRequestMap = new Map<string, { count: number; windowStart: number }>()
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown'
   const now = Date.now()
   const record = ipRequestMap.get(ip)
