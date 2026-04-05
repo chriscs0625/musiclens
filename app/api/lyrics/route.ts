@@ -50,14 +50,16 @@ export async function POST(request: NextRequest): Promise<NextResponse<LyricsRes
     const tamilHit = await searchTamilSong(query)
     
     if (tamilHit) {
+      const metadataSource = metadata ?? {
+        title: tamilHit.title,
+        artist: tamilHit.artist,
+        album: tamilHit.album,
+        year: tamilHit.year,
+      }
+      
       const response: LyricsResponse = {
         found: true,
-        song: metadata || {
-          title: tamilHit.title,
-          artist: tamilHit.artist,
-          album: tamilHit.album,
-          year: tamilHit.year,
-        },
+        song: metadataSource,
         lyrics: {
           tamil: {
             content: `${tamilHit.transliteration}\n\n---\n\n${tamilHit.script}`,
