@@ -3,11 +3,6 @@
 import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Copy, Check } from 'lucide-react'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 interface LyricsPanelProps {
   title: string
@@ -23,25 +18,7 @@ export function LyricsPanel({
   isLoading = false,
 }: LyricsPanelProps) {
   const [copied, setCopied] = useState(false)
-  const panelRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(() => {
-    if (isLoading || !lyrics) return;
-    
-    const lines = gsap.utils.toArray('.lyric-line');
-    
-    gsap.fromTo(lines, 
-      { opacity: 0, y: 10 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.4,
-        stagger: 0.03,
-        clearProps: 'opacity'
-      }
-    )
-  }, { scope: containerRef, dependencies: [lyrics, isLoading] })
 
   const handleCopy = async () => {
     try {
@@ -105,7 +82,7 @@ export function LyricsPanel({
             {lyrics.split('\n').map((line, idx) => (
               <p
                 key={idx}
-                className="lyric-line text-slate-200 leading-relaxed whitespace-pre-wrap break-words text-base font-medium"
+                className="lyric-line text-slate-200 text-base leading-relaxed py-1"
               >
                 {line || '\u00A0'}
               </p>
