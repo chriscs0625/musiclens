@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Syne, DM_Sans, Noto_Sans_Tamil } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Providers } from './providers'
+import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 const syne = Syne({ 
@@ -41,13 +42,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body 
-        className={`${syne.variable} ${dmSans.variable} ${notoTamilSans.variable} text-slate-100 font-sans antialiased`}
+        className={`${syne.variable} ${dmSans.variable} ${notoTamilSans.variable} font-sans antialiased bg-[var(--bg-primary)] text-[var(--text-primary)]`}
       >
-        <Providers>
-          {children}
-        </Providers>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-      </body>
-    </html>
-  )
-}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Providers>
+            {children}
+          </Providers>
+        </ThemeProvider>
