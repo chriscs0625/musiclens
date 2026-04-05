@@ -25,6 +25,18 @@ export function DualPanelLayout({
   const showEnglish = Boolean(englishLyrics)
   const showTamil = Boolean(tamilLyrics)
 
+  // Parse unified Tamil output if it contains '---'
+  let parsedTanglish = tamilLyrics
+  let parsedTamilScript = ''
+  if (tamilLyrics && tamilLyrics.includes('---')) {
+    const parts = tamilLyrics.split('---')
+    parsedTanglish = parts[0].trim()
+    parsedTamilScript = parts[1].trim()
+  }
+
+  const currentTamilDisplay = 
+    tamilDisplayMode === 'tamil' && parsedTamilScript ? parsedTamilScript : parsedTanglish
+
   if (!showEnglish && !showTamil && !isLoading) {
     return (
       <div className="flex items-center justify-center py-20 px-4">
@@ -52,12 +64,40 @@ export function DualPanelLayout({
             />
           )}
           {showTamil && (
-            <LyricsPanel
-              title={tamilScript === 'tamil' ? 'Tamil Lyrics' : 'Tanglish Lyrics'}
-              lyrics={tamilLyrics || ''}
-              accentColor="amber"
-              isLoading={isLoading}
-            />
+            <div className="flex flex-col">
+              {tamilScript === 'tamil' && parsedTamilScript && (
+                <div className="mb-4 max-w-sm mx-auto">
+                  <Tabs
+                    value={tamilDisplayMode}
+                    onValueChange={(v) =>
+                      setTamilDisplayMode(v as 'tanglish' | 'tamil')
+                    }
+                    className="w-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-2 glass rounded-full p-1 h-auto">
+                      <TabsTrigger
+                        value="tanglish"
+                        className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+                      >
+                        Tanglish
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="tamil"
+                        className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+                      >
+                        Tamil Script
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+              )}
+              <LyricsPanel
+                title={tamilDisplayMode === 'tamil' ? 'Tamil Lyrics' : 'Tanglish Lyrics'}
+                lyrics={currentTamilDisplay || ''}
+                accentColor="amber"
+                isLoading={isLoading}
+              />
+            </div>
           )}
         </div>
       ) : (
@@ -73,7 +113,7 @@ export function DualPanelLayout({
 
           {/* Tamil Panel with Script Toggle */}
           <div className="flex flex-col">
-            {tamilScript === 'tanglish' && (
+            {tamilScript === 'tamil' && parsedTamilScript && (
               <div className="mb-4">
                 <Tabs
                   value={tamilDisplayMode}
@@ -102,9 +142,9 @@ export function DualPanelLayout({
 
             <LyricsPanel
               title={
-                tamilScript === 'tamil' ? 'Tamil Lyrics' : 'Tanglish Lyrics'
+                tamilDisplayMode === 'tamil' ? 'Tamil Lyrics' : 'Tanglish Lyrics'
               }
-              lyrics={tamilLyrics || ''}
+              lyrics={currentTamilDisplay || ''}
               accentColor="amber"
               isLoading={isLoading}
             />
