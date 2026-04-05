@@ -32,17 +32,13 @@ export function LyricsPanel({
     const lines = gsap.utils.toArray('.lyric-line');
     
     gsap.fromTo(lines, 
-      { opacity: 0, y: 20 },
+      { opacity: 0, y: 10 },
       {
         opacity: 1,
         y: 0,
-        duration: 0.5,
-        stagger: 0.04,
-        clearProps: 'opacity',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 85%'
-        }
+        duration: 0.4,
+        stagger: 0.03,
+        clearProps: 'opacity'
       }
     )
   }, { scope: containerRef, dependencies: [lyrics, isLoading] })
@@ -110,7 +106,6 @@ export function LyricsPanel({
               <p
                 key={idx}
                 className="lyric-line text-slate-200 leading-relaxed whitespace-pre-wrap break-words text-base font-medium"
-                style={{ opacity: 0 }}
               >
                 {line || '\u00A0'}
               </p>
